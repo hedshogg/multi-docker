@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 
-FROM ngingx
+FROM nginx
 
 EXPOSE 3000
 

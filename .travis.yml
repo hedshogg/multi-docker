@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t hedshogg/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true hedshogg/react-test npm run test
+
+after_success:
+  - docker build -t hedshogg/multi-client client
+  - docker build -t hedshogg/multi-nginx nginx
+  - docker build -t hedshogg/multi-server server
+  - docker build -t hedshogg/multi-worker worker
+  # Log in to docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take images and push to docker hub
+  - docker push hedshogg/multi-client
+  - docker push hedshogg/multi-nginx
+  - docker push hedshogg/multi-server
+  - docker push hedshogg/multi-worker
